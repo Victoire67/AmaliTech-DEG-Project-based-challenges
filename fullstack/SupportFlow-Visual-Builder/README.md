@@ -1,75 +1,92 @@
-# React + TypeScript + Vite
+# SupportFlow Visual Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A visual decision-tree editor for building and testing automated Help Bot conversation flows, built for SupportFlow AI to replace their error-prone spreadsheet-based configuration process.
 
-Currently, two official plugins are available:
+Non-technical managers can see their bot's conversation logic as a flowchart, edit questions in real time, and test-drive the bot instantly.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+### Visual Flow Canvas
+- Renders conversation nodes as draggable cards, positioned absolutely from JSON coordinates.
+- Parent → child relationships are drawn as SVG connector lines, computed manually from node coordinates and measured DOM dimensions (no charting/graph library used).
+- A dot-grid canvas background gives the workspace a native "design tool" feel.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Real-Time Editing
+- Clicking a node (as opposed to dragging it) opens an edit modal.
+- Changes are held in local component state and applied to the canvas immediately on save, no backend or persistence layer required.
 
-## Expanding the ESLint configuration
+### Preview / Test-Drive Mode
+- A chat-style interface that lets you walk through the bot's logic exactly as a real customer would.
+- Each answer selection appends to a running chat log and advances to the next node.
+- Reaching an `end` node surfaces a **Restart** action to run through the flow again.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Search
+- A search bar lets you filter the canvas by node text.
+- Non-matching nodes are dimmed to 50% opacity rather than removed, so the overall shape of the flow stays visible.
+- Connectors are hidden entirely when either endpoint doesn't match the current search, since a connector isn't meaningful once one of the two nodes it joins is no longer relevant.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**Why this feature:** as a bot's flow grows to dozens or hundreds of nodes, visually scanning the whole canvas to find a specific question becomes impractical, exactly the kind of friction this tool exists to remove.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Motion
+- Nodes animate in with a subtle scale/fade using Framer Motion, rather than appearing abruptly.
+- Search-driven opacity changes transition smoothly instead of snapping instantly.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
 
-```
+## Tech Stack
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Framework | React + TypeScript (Vite) |
+| Styling | Tailwind CSS v4 (custom `@theme` tokens, no component libraries) |
+| Animation | Framer Motion |
+| Canvas / Connectors | Custom SVG + DOM coordinate math |
+| Package manager | pnpm |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Design System
+
+Design file: [Figma design](https://www.figma.com/design/OqX5NNPFFd842pOxH0fb8J/SupportFlow-Visual-Builder-This-challenge-is-designed-to-test-your-ability-to-bridge-Computer-Scienc?node-id=4-4&t=g45nS8779KAvkxNu-1)
+
+---
+
+## Project Structure
 
 ```
+src/
+ ├─ components/
+ │   ├─ Canvas/
+ │   │   ├─ Canvas.tsx        # Owns node state, positions, dimensions, search, modal state
+ │   │   ├─ Node.tsx          # Presentational node card
+ │   │   ├─ Connector.tsx     # SVG line between two nodes
+ │   │   └─ EditModal.tsx     # Click-to-edit node modal
+ │   ├─ Header.tsx
+ │   └─ Footer.tsx
+ ├─ pages/
+ │   ├─ EditorView.tsx        # Flowchart / editing view
+ │   └─ PreviewMode.tsx       # Chat-style "test drive" runner
+ ├─ types/
+ │   └─ Node/NodeTypes.ts     # FlowNode, NodeOption, Dimensions, etc.
+ ├─ data/
+ │   └─ flow_data.json        # Source conversation data
+ └─ App.tsx
+```
+
+---
+
+## Getting Started
+
+```bash
+# install dependencies
+pnpm install
+
+# start the dev server
+pnpm dev
+
+# type-check
+pnpm tsc --noEmit
+
+# production build
+pnpm build
+```
+
