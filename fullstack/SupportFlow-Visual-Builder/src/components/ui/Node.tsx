@@ -7,8 +7,6 @@ function NodeCard({
   type,
   text,
   options = [],
-  state = "default",
-  onSelectOption,
   onClick,
 }: NodeCardProps) {
   const isHavingOptions = type === "question"  && options.length  || type === "start"  && options.length 

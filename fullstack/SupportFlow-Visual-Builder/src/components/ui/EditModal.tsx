@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { type EditNodeModalProps } from "../../../types/Node/NodeTypes";
 
 
-function EditNodeModal({ node, onClose, onSave , isOpen }: EditNodeModalProps) {
+function EditNodeModal({ node, onClose, onSave  }: EditNodeModalProps) {
   const [text, setText] = useState("");
 
   // Sync local input state whenever a new node is opened
