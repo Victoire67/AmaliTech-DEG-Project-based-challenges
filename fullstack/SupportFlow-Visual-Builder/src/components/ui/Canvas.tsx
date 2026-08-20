@@ -3,32 +3,8 @@ import { useRef, useState, useLayoutEffect } from "react";
 import NodeCard from "./Node";
 import Connector from "./Connector";
 import EditNodeModal from "./EditModal";
+import  {type FlowNode , type Dimensions} from "../../../types/Node/NodeTypes"
 
-// types/flow.ts
-export type NodeType = "start" | "question" | "end";
-
-export interface NodeOption {
-  label: string;
-  nextId: string;
-}
-
-export interface NodePosition {
-  x: number;
-  y: number;
-}
-
-export interface FlowNode {
-  id: string;
-  type: NodeType;
-  text: string;
-  position: NodePosition;
-  options?: NodeOption[];
-}
-
-interface Dimensions {
-  width: number;
-  height: number;
-}
 
 // DraggableNode: wraps NodeCard with drag + size-measuring behavior ----
 function DraggableNode({
@@ -166,7 +142,7 @@ function Canvas({ children }: { children: FlowNode[] }) {
             key={conn.key}
             from={conn.from.position}
             to={conn.to.position}
-            fromSize={dimensions[conn.from.id]}
+            fromSize={dimensions[conn.from.id] }
             toSize={dimensions[conn.to.id]}
           />
         ))}
@@ -184,7 +160,7 @@ function Canvas({ children }: { children: FlowNode[] }) {
       ))}
 
       {/* Modal — controlled by editingNodeId, renders on top of everything */}
-      <EditNodeModal node={editingNode} onClose={handleModalClose} onSave={handleNodeSave} />
+      <EditNodeModal isOpen={editingNode ? true : false} node={editingNode} onClose={handleModalClose} onSave={handleNodeSave} />
     </div>
   );
 }

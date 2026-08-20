@@ -1,13 +1,7 @@
 // components/Canvas/EditNodeModal.tsx
 import { useState, useEffect } from "react";
-import type { FlowNode } from "./Canvas";
+import { type EditNodeModalProps } from "../../../types/Node/NodeTypes";
 
-interface EditNodeModalProps {
-  isOpen : boolean;
-  node: FlowNode | null;
-  onClose: () => void;
-  onSave: (id: string, updatedText: string) => void;
-}
 
 function EditNodeModal({ node, onClose, onSave , isOpen }: EditNodeModalProps) {
   const [text, setText] = useState("");

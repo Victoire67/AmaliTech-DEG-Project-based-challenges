@@ -1,21 +1,7 @@
 import Option from "./Option";
-
+import { type NodeCardProps } from "../../../types/Node/NodeTypes";
 // components/NodeCard/NodeCard.tsx
-export type NodeType = "start" | "question" | "end" ;
 
-export interface NodeOption {
-  id: string;
-  label: string;
-}
-
-export interface NodeCardProps {
-  type: NodeType;
-  text: string;
-  options?: NodeOption[];
-  state?: "default" | "selected" | "error";
-  onSelectOption?: (optionId: string) => void;
-  onClick?: () => void;
-}
 
 function NodeCard({
   type,

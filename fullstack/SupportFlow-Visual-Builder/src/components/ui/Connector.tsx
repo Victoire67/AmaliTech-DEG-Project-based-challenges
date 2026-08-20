@@ -1,9 +1,6 @@
 // components/Canvas/Connector.tsx
-interface ConnectorProps {
-  from: { x: number; y: number };
-  to: { x: number; y: number };
-}
 
+import { type ConnectorProps } from "../../../types/Node/NodeTypes";
 // Node card dimensions — must match your NodeCard's actual rendered size
 const NODE_WIDTH = 256; // w-64 = 16rem = 256px
 const NODE_HEIGHT_ESTIMATE = 80; // approximate anchor point vertically

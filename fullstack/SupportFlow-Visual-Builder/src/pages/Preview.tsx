@@ -1,6 +1,6 @@
 // pages/PreviewMode.tsx
 import { useState } from "react";
-import type { FlowData, FlowNode } from "../types/flow";
+import type { FlowData, FlowNode } from "../../types/Node/NodeTypes";
 import Header from "../components/ui/Header";
 import Footer from "../components/ui/Footer";
 
