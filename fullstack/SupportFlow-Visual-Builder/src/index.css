@@ -14,3 +14,7 @@
   --radius-card: 0.75rem;
   --font-display: "Inter", sans-serif;
 }
+
+body{
+  @apply bg-black
+}

@@ -10,7 +10,7 @@ function Header() {
 
 return (
         <>
-            <header className="bg-[#FF9D42] w-full flex place-content-between px-20 py-4 items-center text-white ">
+            <header className="bg-[#FF9D42] w-full flex place-content-between px-20 py-4 items-center text-white">
                 <h1 className="font-bold">SUPPORT FLOW</h1>
                 <NavLink to={location.pathname === "/preview" ? "/" : "preview"}>
                     <button className="bg-white h- flex items-center text-[#FF9D42] rounded-lg p-2" onClick={changePath}>
