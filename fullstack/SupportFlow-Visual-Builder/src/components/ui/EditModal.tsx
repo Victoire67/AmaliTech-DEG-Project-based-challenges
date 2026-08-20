@@ -51,7 +51,7 @@ function EditNodeModal({ node, onClose, onSave , isOpen }: EditNodeModalProps) {
             Cancel
           </button>
           <button
-            className="px-4 py-2 rounded-lg bg-node-selected text-white hover:opacity-90"
+            className="px-4 py-2 rounded-lg bg-[#FF9D42] text-white hover:opacity-90"
             onClick={handleSave}
           >
             Save
