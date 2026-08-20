@@ -1,1 +1,16 @@
-@import "tailwindcss"
+/* index.css */
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #FAFAFA;
+  --color-node-default: #FFFFFF;
+  --color-node-selected: #3B82F6;
+  --color-connector: #9CA3AF;
+  --color-success: #22C55E;
+  --color-error: #EF4444;
+  --color-primary : #FF9D42
+
+  --spacing-card: 1rem;
+  --radius-card: 0.75rem;
+  --font-display: "Inter", sans-serif;
+}
