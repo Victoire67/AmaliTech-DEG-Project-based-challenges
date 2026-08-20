@@ -2,6 +2,7 @@
 import { useRef, useState, useLayoutEffect } from "react";
 import NodeCard from "./Node";
 import Connector from "./Connector";
+import EditNodeModal from "./EditModal";
 
 // types/flow.ts
 export type NodeType = "start" | "question" | "end";
@@ -29,19 +30,22 @@ interface Dimensions {
   height: number;
 }
 
-
 // DraggableNode: wraps NodeCard with drag + size-measuring behavior ----
 function DraggableNode({
   node,
   onPositionChange,
   onMeasure,
+  onNodeClick,
 }: {
   node: FlowNode;
   onPositionChange: (id: string, x: number, y: number) => void;
   onMeasure: (id: string, width: number, height: number) => void;
+  onNodeClick: (id: string) => void;
 }) {
   const [dragging, setDragging] = useState(false);
   const offset = useRef({ x: 0, y: 0 });
+  const pointerDownPos = useRef({ x: 0, y: 0 });
+  const hasMoved = useRef(false);
   const nodeRef = useRef<HTMLDivElement>(null);
 
   // Re-measure real rendered size after every render (text edits can change height)
@@ -55,6 +59,8 @@ function DraggableNode({
   const handlePointerDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest("button")) return; // don't drag when clicking an answer
     setDragging(true);
+    hasMoved.current = false;
+    pointerDownPos.current = { x: e.clientX, y: e.clientY };
     offset.current = {
       x: e.clientX - node.position.x,
       y: e.clientY - node.position.y,
@@ -64,11 +70,22 @@ function DraggableNode({
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!dragging) return;
+
+    // Mark as a real drag once the pointer has moved a few pixels
+    const dx = Math.abs(e.clientX - pointerDownPos.current.x);
+    const dy = Math.abs(e.clientY - pointerDownPos.current.y);
+    if (dx > 4 || dy > 4) hasMoved.current = true;
+
     onPositionChange(node.id, e.clientX - offset.current.x, e.clientY - offset.current.y);
   };
 
-
-  const handlePointerUp = () => setDragging(false);
+  const handlePointerUp = () => {
+    setDragging(false);
+    // Only treat it as a "click" (open modal) if the pointer barely moved
+    if (!hasMoved.current) {
+      onNodeClick(node.id);
+    }
+  };
 
   return (
     <div
@@ -84,11 +101,12 @@ function DraggableNode({
   );
 }
 
-//Canvas: owns node positions/sizes, renders connectors + draggable nodes ----
+// Canvas: owns node positions/sizes, renders connectors + draggable nodes ----
 function Canvas({ children }: { children: FlowNode[] }) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<FlowNode[]>(children);
   const [dimensions, setDimensions] = useState<Record<string, Dimensions>>({});
+  const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
 
   const updateNodePosition = (id: string, x: number, y: number) => {
     setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, position: { x, y } } : n)));
@@ -113,6 +131,24 @@ function Canvas({ children }: { children: FlowNode[] }) {
       })
       .filter((c): c is { from: FlowNode; to: FlowNode; key: string } => c !== null)
   );
+
+  // Open modal for the clicked node
+  const handleNodeClick = (id: string) => {
+    setEditingNodeId(id);
+  };
+
+  // Close modal without saving
+  const handleModalClose = () => {
+    setEditingNodeId(null);
+  };
+
+  // Persist edited text back into node state, then close
+  const handleNodeSave = (id: string, updatedText: string) => {
+    setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, text: updatedText } : n)));
+    setEditingNodeId(null);
+  };
+
+  const editingNode = nodes.find((n) => n.id === editingNodeId) ?? null;
 
   return (
     <div
@@ -143,8 +179,12 @@ function Canvas({ children }: { children: FlowNode[] }) {
           node={node}
           onPositionChange={updateNodePosition}
           onMeasure={reportDimensions}
+          onNodeClick={handleNodeClick}
         />
       ))}
+
+      {/* Modal — controlled by editingNodeId, renders on top of everything */}
+      <EditNodeModal node={editingNode} onClose={handleModalClose} onSave={handleNodeSave} />
     </div>
   );
 }
