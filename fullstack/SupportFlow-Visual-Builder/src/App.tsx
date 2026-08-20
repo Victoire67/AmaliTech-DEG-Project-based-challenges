@@ -3,7 +3,7 @@ import EditorPage from "./pages/Editor";
 import PreviewPage from "./pages/Preview";
 import NotFound from "./components/ui/NotFound";
 import "./index.css"
-
+import flowData from "../flow_data.json"
 const router = createBrowserRouter([
   {
     path: "/",
@@ -11,7 +11,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/preview",
-    element: <PreviewPage />
+    element: <PreviewPage flowData={flowData} />
   },
   {
     path: "*",
