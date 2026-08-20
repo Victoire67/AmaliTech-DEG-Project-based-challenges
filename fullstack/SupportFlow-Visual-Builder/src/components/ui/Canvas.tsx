@@ -4,7 +4,7 @@ import NodeCard from "./Node";
 import Connector from "./Connector";
 import EditNodeModal from "./EditModal";
 import  {type FlowNode , type Dimensions} from "../../../types/Node/NodeTypes"
-
+import {motion} from "framer-motion"
 
 // DraggableNode: wraps NodeCard with drag + size-measuring behavior ----
 function DraggableNode({
@@ -66,16 +66,19 @@ function DraggableNode({
   };
 
   return (
-    <div
-      ref={nodeRef}
-      className="absolute cursor-grab active:cursor-grabbing select-none transition-opacity duration-200"
-      style={{ left: node.position.x, top: node.position.y, opacity: dimmed ? 0.5 : 1 }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-    >
-      <NodeCard type={node.type} text={node.text} options={node.options} />
-    </div>
+  <motion.div
+    ref={nodeRef}
+    className="absolute cursor-grab active:cursor-grabbing select-none"
+    style={{ left: node.position.x, top: node.position.y, opacity: dimmed ? 0.5 : 1 }}
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: dimmed ? 0.5 : 1, scale: 1 }}
+    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+    onPointerDown={handlePointerDown}
+    onPointerMove={handlePointerMove}
+    onPointerUp={handlePointerUp}
+  >
+    <NodeCard type={node.type} text={node.text} options={node.options} />
+  </motion.div>
   );
 }
 
