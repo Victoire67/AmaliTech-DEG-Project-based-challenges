@@ -1,9 +1,12 @@
 import Header from "../components/ui/Header";
-import NodeCard from "../components/ui/Node";
+import Canvas from "../components/ui/Canvas";
+import data from "../../flow_data.json"
+
 function EditorPage() {
+    const nodes = data.nodes;
     return <>
         <Header />
-        <NodeCard type="question" text="boro niaye ?" options={[{ id: "1", label: "What is your name" }, { id: "2", label: "I don't have one" }]} />
+        <Canvas children = {nodes} />
     </>
 }
 

@@ -25,6 +25,7 @@ function NodeCard({
   onSelectOption,
   onClick,
 }: NodeCardProps) {
+  const isHavingOptions = type === "question"  && options.length  || type === "start"  && options.length 
   return (
     <div className={`bg-white grid gap-6  w-[288px] shadow-lg rounded-xl px-2 text-left py-4`} onClick={onClick}>
       {/* Label — "question" or "end" */}
@@ -38,7 +39,7 @@ function NodeCard({
       </p>
 
       {/* Answer options — only for question nodes */}
-      {type === "question" && options.length > 0 && (
+      {isHavingOptions && (
         <div className="flex flex-col gap-2 mt-1 text-left">
           {options.map((opt) => (
           <Option question={opt.label} />
