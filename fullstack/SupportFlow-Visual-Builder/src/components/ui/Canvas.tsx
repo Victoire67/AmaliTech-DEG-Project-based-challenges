@@ -12,11 +12,13 @@ function DraggableNode({
   onPositionChange,
   onMeasure,
   onNodeClick,
+  dimmed,
 }: {
   node: FlowNode;
   onPositionChange: (id: string, x: number, y: number) => void;
   onMeasure: (id: string, width: number, height: number) => void;
   onNodeClick: (id: string) => void;
+  dimmed: boolean;
 }) {
   const [dragging, setDragging] = useState(false);
   const offset = useRef({ x: 0, y: 0 });
@@ -66,8 +68,8 @@ function DraggableNode({
   return (
     <div
       ref={nodeRef}
-      className="absolute cursor-grab active:cursor-grabbing select-none"
-      style={{ left: node.position.x, top: node.position.y }}
+      className="absolute cursor-grab active:cursor-grabbing select-none transition-opacity duration-200"
+      style={{ left: node.position.x, top: node.position.y, opacity: dimmed ? 0.5 : 1 }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -83,6 +85,7 @@ function Canvas({ children }: { children: FlowNode[] }) {
   const [nodes, setNodes] = useState<FlowNode[]>(children);
   const [dimensions, setDimensions] = useState<Record<string, Dimensions>>({});
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const updateNodePosition = (id: string, x: number, y: number) => {
     setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, position: { x, y } } : n)));
@@ -126,6 +129,13 @@ function Canvas({ children }: { children: FlowNode[] }) {
 
   const editingNode = nodes.find((n) => n.id === editingNodeId) ?? null;
 
+  // A node is dimmed when there's an active search query and its text doesn't match
+  const isNodeDimmed = (node: FlowNode) => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return false;
+    return !node.text.toLowerCase().includes(query);
+  };
+
   return (
     <div
       ref={canvasRef}
@@ -135,17 +145,36 @@ function Canvas({ children }: { children: FlowNode[] }) {
         backgroundSize: "24px 24px",
       }}
     >
+      {/* Search bar — floats above the canvas */}
+      <div className="absolute top-4 left-4 z-10">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search nodes..."
+          className="px-3 py-2 rounded-lg border border-gray-300 bg-white/90 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-node-selected w-56"
+        />
+      </div>
+
       {/* Connector layer — sits behind nodes, ignores pointer events so dragging isn't blocked */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
-        {connections.map((conn) => (
-          <Connector
-            key={conn.key}
-            from={conn.from.position}
-            to={conn.to.position}
-            fromSize={dimensions[conn.from.id] }
-            toSize={dimensions[conn.to.id]}
-          />
-        ))}
+        {connections.map((conn) => {
+          // A connector is only useful when both ends are relevant to the current
+          // search — if either end is dimmed, hide the connector entirely rather
+          // than just fading it.
+          const connectorHidden = isNodeDimmed(conn.from) || isNodeDimmed(conn.to);
+          if (connectorHidden) return null;
+
+          return (
+            <Connector
+              key={conn.key}
+              from={conn.from.position}
+              to={conn.to.position}
+              fromSize={dimensions[conn.from.id]}
+              toSize={dimensions[conn.to.id]}
+            />
+          );
+        })}
       </svg>
 
       {/* Node layer */}
@@ -156,6 +185,7 @@ function Canvas({ children }: { children: FlowNode[] }) {
           onPositionChange={updateNodePosition}
           onMeasure={reportDimensions}
           onNodeClick={handleNodeClick}
+          dimmed={isNodeDimmed(node)}
         />
       ))}
 
