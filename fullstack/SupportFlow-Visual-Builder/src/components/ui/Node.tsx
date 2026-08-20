@@ -27,7 +27,7 @@ function NodeCard({
 }: NodeCardProps) {
   const isHavingOptions = type === "question"  && options.length  || type === "start"  && options.length 
   return (
-    <div className={`bg-white grid gap-6  w-[288px] shadow-lg rounded-xl px-2 text-left py-4`} onClick={onClick}>
+    <div className={`bg-white grid gap-6 cursor-pointer  w-[288px] shadow-lg rounded-xl px-2 text-left py-4`} onClick={onClick}>
       {/* Label — "question" or "end" */}
       <span className="text-xs font-medium text-gray-400 tracking-wide">
         {type}
